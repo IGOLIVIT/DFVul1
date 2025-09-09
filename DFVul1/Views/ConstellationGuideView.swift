@@ -38,15 +38,17 @@ struct ConstellationGuideView: View {
                 )
                 .ignoresSafeArea()
                 
-                // Background stars
-                ForEach(0..<30, id: \.self) { index in
-                    Circle()
-                        .fill(Color.white.opacity(Double.random(in: 0.1...0.3)))
-                        .frame(width: CGFloat.random(in: 1...3))
-                        .position(
-                            x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
-                            y: CGFloat.random(in: 0...UIScreen.main.bounds.height)
-                        )
+                // Background stars (fixed positions to prevent UI jumping)
+                GeometryReader { geometry in
+                    ForEach(0..<30, id: \.self) { index in
+                        Circle()
+                            .fill(Color.white.opacity(backgroundStarOpacity(for: index)))
+                            .frame(width: backgroundStarSize(for: index))
+                            .position(
+                                x: backgroundStarX(for: index, width: geometry.size.width),
+                                y: backgroundStarY(for: index, height: geometry.size.height)
+                            )
+                    }
                 }
                 
                 VStack(spacing: 0) {
@@ -192,14 +194,20 @@ struct ConstellationCard: View {
                         .frame(width: 80, height: 60)
                     
                     // Mini constellation pattern
-                    ForEach(Array(constellation.pattern.prefix(5).enumerated()), id: \.offset) { index, point in
-                        Circle()
-                            .fill(constellation.color)
-                            .frame(width: 4, height: 4)
-                            .position(
-                                x: 40 + point.x * 0.15,
-                                y: 30 + point.y * 0.15
-                            )
+                    GeometryReader { geometry in
+                        let centerX = geometry.size.width / 2
+                        let centerY = geometry.size.height / 2
+                        let scale: CGFloat = 0.12
+                        
+                        ForEach(Array(constellation.pattern.prefix(5).enumerated()), id: \.offset) { index, point in
+                            Circle()
+                                .fill(constellation.color)
+                                .frame(width: 4, height: 4)
+                                .position(
+                                    x: centerX + point.x * scale,
+                                    y: centerY + point.y * scale
+                                )
+                        }
                     }
                 }
                 
@@ -294,39 +302,48 @@ struct ConstellationDetailView: View {
                                 .multilineTextAlignment(.center)
                             
                             // Large constellation pattern
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.black.opacity(0.3))
-                                    .frame(height: 200)
+                            GeometryReader { geometry in
+                                let containerWidth = geometry.size.width
+                                let containerHeight: CGFloat = 200
+                                let centerX = containerWidth / 2
+                                let centerY = containerHeight / 2
+                                let scale: CGFloat = 0.6
                                 
-                                ForEach(Array(constellation.pattern.enumerated()), id: \.offset) { index, point in
-                                    Circle()
-                                        .fill(constellation.color)
-                                        .frame(width: 8, height: 8)
-                                        .position(
-                                            x: 150 + point.x * 0.8,
-                                            y: 100 + point.y * 0.8
-                                        )
-                                }
-                                
-                                // Connect the dots with lines
-                                Path { path in
-                                    let points = constellation.pattern.map { point in
-                                        CGPoint(
-                                            x: 150 + point.x * 0.8,
-                                            y: 100 + point.y * 0.8
-                                        )
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color.black.opacity(0.3))
+                                        .frame(height: containerHeight)
+                                    
+                                    ForEach(Array(constellation.pattern.enumerated()), id: \.offset) { index, point in
+                                        Circle()
+                                            .fill(constellation.color)
+                                            .frame(width: 8, height: 8)
+                                            .position(
+                                                x: centerX + point.x * scale,
+                                                y: centerY + point.y * scale
+                                            )
                                     }
                                     
-                                    if !points.isEmpty {
-                                        path.move(to: points[0])
-                                        for point in points.dropFirst() {
-                                            path.addLine(to: point)
+                                    // Connect the dots with lines
+                                    Path { path in
+                                        let points = constellation.pattern.map { point in
+                                            CGPoint(
+                                                x: centerX + point.x * scale,
+                                                y: centerY + point.y * scale
+                                            )
+                                        }
+                                        
+                                        if !points.isEmpty {
+                                            path.move(to: points[0])
+                                            for point in points.dropFirst() {
+                                                path.addLine(to: point)
+                                            }
                                         }
                                     }
+                                    .stroke(constellation.color.opacity(0.5), lineWidth: 2)
                                 }
-                                .stroke(constellation.color.opacity(0.5), lineWidth: 2)
                             }
+                            .frame(height: 200)
                             .padding(.horizontal, 20)
                         }
                         
@@ -444,6 +461,35 @@ struct InfoSection: View {
 struct ConstellationWrapper: Identifiable {
     let id = UUID()
     let constellation: Star.ConstellationType
+}
+
+// MARK: - Background Star Helper Functions
+extension ConstellationGuideView {
+    private func backgroundStarOpacity(for index: Int) -> Double {
+        // Use deterministic values based on index to prevent random changes
+        let values: [Double] = [0.1, 0.15, 0.2, 0.25, 0.3, 0.12, 0.18, 0.22, 0.28, 0.14]
+        return values[index % values.count]
+    }
+    
+    private func backgroundStarSize(for index: Int) -> CGFloat {
+        // Use deterministic values based on index
+        let sizes: [CGFloat] = [1, 1.5, 2, 2.5, 3, 1.2, 1.8, 2.2, 2.8, 1.4]
+        return sizes[index % sizes.count]
+    }
+    
+    private func backgroundStarX(for index: Int, width: CGFloat) -> CGFloat {
+        // Create pseudo-random but deterministic X positions
+        let factor = Double(index * 37 + 17) // Prime numbers for better distribution
+        let normalized = (factor.truncatingRemainder(dividingBy: 1000)) / 1000.0
+        return CGFloat(normalized) * width
+    }
+    
+    private func backgroundStarY(for index: Int, height: CGFloat) -> CGFloat {
+        // Create pseudo-random but deterministic Y positions
+        let factor = Double(index * 43 + 23) // Different prime numbers
+        let normalized = (factor.truncatingRemainder(dividingBy: 1000)) / 1000.0
+        return CGFloat(normalized) * height
+    }
 }
 
 #Preview {

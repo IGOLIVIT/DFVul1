@@ -223,16 +223,54 @@ class GameViewModel: ObservableObject {
         let screenHeight: CGFloat = 600
         let starCount = userService.difficulty.starsCount
         
-        // Generate constellation stars
+        // Generate constellation stars in a more centered pattern
         let constellationCount = max(3, starCount / 2)
-        for i in 0..<constellationCount {
+        let centerX = screenWidth / 2
+        let centerY = screenHeight / 2
+        let constellationRadius: CGFloat = 120
+        
+        // Create constellation pattern based on the actual constellation shape
+        let pattern = currentConstellation.pattern
+        let scale: CGFloat = 0.8
+        
+        for i in 0..<min(constellationCount, pattern.count) {
+            let patternPoint = pattern[i]
             let position = CGPoint(
-                x: CGFloat.random(in: 50...(screenWidth - 50)),
-                y: CGFloat.random(in: 100...(screenHeight - 100))
+                x: centerX + patternPoint.x * scale + CGFloat.random(in: -20...20),
+                y: centerY + patternPoint.y * scale + CGFloat.random(in: -20...20)
+            )
+            
+            // Ensure position is within bounds
+            let clampedPosition = CGPoint(
+                x: max(30, min(screenWidth - 30, position.x)),
+                y: max(80, min(screenHeight - 80, position.y))
             )
             
             let star = Star(
-                position: position,
+                position: clampedPosition,
+                constellationType: currentConstellation,
+                brightness: Double.random(in: 0.7...1.0)
+            )
+            stars.append(star)
+        }
+        
+        // Add extra constellation stars if needed
+        let remainingConstellationStars = constellationCount - pattern.count
+        for _ in 0..<max(0, remainingConstellationStars) {
+            let angle = Double.random(in: 0...(2 * Double.pi))
+            let radius = CGFloat.random(in: 30...constellationRadius)
+            let position = CGPoint(
+                x: centerX + cos(angle) * radius,
+                y: centerY + sin(angle) * radius
+            )
+            
+            let clampedPosition = CGPoint(
+                x: max(30, min(screenWidth - 30, position.x)),
+                y: max(80, min(screenHeight - 80, position.y))
+            )
+            
+            let star = Star(
+                position: clampedPosition,
                 constellationType: currentConstellation,
                 brightness: Double.random(in: 0.7...1.0)
             )

@@ -93,12 +93,12 @@ struct OnboardingView: View {
                         switch viewModel.currentStep {
                         case .welcome:
                             WelcomeStepView()
-                        case .gameIntro:
-                            GameIntroStepView()
-                        case .tutorial:
-                            SimpleTutorialStepView()
-                        case .features:
-                            FeaturesStepView(isAnimating: viewModel.isAnimating)
+                        case .gameRules:
+                            GameRulesStepView()
+                        case .howToPlay:
+                            HowToPlayStepView()
+                        case .scoring:
+                            ScoringStepView(isAnimating: viewModel.isAnimating)
                         case .completed:
                             CompletedStepView()
                         }
@@ -154,28 +154,27 @@ struct OnboardingView: View {
 struct WelcomeStepView: View {
     var body: some View {
         VStack(spacing: 30) {
-            // Animated logo/icon
+            // Logo animation
             ZStack {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "#ffbe00").opacity(0.3), Color.clear],
+                            colors: [
+                                Color(hex: "#ffbe00").opacity(0.3),
+                                Color.clear
+                            ],
                             center: .center,
                             startRadius: 0,
-                            endRadius: 80
+                            endRadius: 100
                         )
                     )
-                    .frame(width: 160, height: 160)
+                    .frame(width: 200, height: 200)
                 
                 Image(systemName: "star.fill")
-                    .font(.system(size: 60))
+                    .font(.system(size: 80))
                     .foregroundColor(Color(hex: "#ffbe00"))
-                    .rotationEffect(.degrees(0))
-                    .animation(
-                        Animation.easeInOut(duration: 3.0).repeatForever(autoreverses: false),
-                        value: true
-                    )
             }
+            .frame(height: 200)
             
             VStack(spacing: 16) {
                 Text("Welcome to StarMatch")
@@ -183,7 +182,7 @@ struct WelcomeStepView: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("Embark on a cosmic journey through the stars and unlock the secrets of the universe")
+                Text("A constellation matching puzzle game where you identify and connect stars to form famous constellations from astronomy.")
                     .font(.system(size: 18))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -193,261 +192,131 @@ struct WelcomeStepView: View {
     }
 }
 
-struct GameIntroStepView: View {
+struct GameRulesStepView: View {
     var body: some View {
         VStack(spacing: 30) {
-            // Game preview
+            // Game rules icon
             ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black.opacity(0.3))
-                    .frame(width: 280, height: 200)
-                
-                // Sample constellation
-                ForEach(0..<7, id: \.self) { index in
-                    Circle()
-                        .fill(Color(hex: "#ffbe00"))
-                        .frame(width: 12, height: 12)
-                        .position(
-                            x: 140 + CGFloat(index * 30 - 90),
-                            y: 100 + CGFloat(sin(Double(index)) * 20)
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color(hex: "#bd0e1b").opacity(0.3),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 80
                         )
-                        .opacity(0.8)
-                }
+                    )
+                    .frame(width: 160, height: 160)
                 
-                // Connecting lines
-                Path { path in
-                    for index in 0..<6 {
-                        let startX = 140 + CGFloat(index * 30 - 90)
-                        let startY = 100 + CGFloat(sin(Double(index)) * 20)
-                        let endX = 140 + CGFloat((index + 1) * 30 - 90)
-                        let endY = 100 + CGFloat(sin(Double(index + 1)) * 20)
-                        
-                        if index == 0 {
-                            path.move(to: CGPoint(x: startX, y: startY))
-                        }
-                        path.addLine(to: CGPoint(x: endX, y: endY))
-                    }
-                }
-                .stroke(Color(hex: "#ffbe00").opacity(0.5), lineWidth: 2)
+                Image(systemName: "target")
+                    .font(.system(size: 60, weight: .medium))
+                    .foregroundColor(Color(hex: "#bd0e1b"))
             }
+            .frame(height: 160)
             
             VStack(spacing: 16) {
-                Text("Match the Constellations")
+                Text("Game Rules")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("Connect stars of the same constellation to score points and learn about space")
-                    .font(.system(size: 18))
-                    .foregroundColor(.white.opacity(0.8))
+                Text("🎯 OBJECTIVE: Find and select stars that belong to the same constellation.\n\n⭐ You need to select at least 3 stars of the target constellation to score points.\n\n⏰ Complete as many constellations as possible before time runs out.")
+                    .font(.system(size: 16))
+                    .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.center)
+                    .lineSpacing(4)
                     .padding(.horizontal, 20)
             }
         }
     }
 }
 
-struct SimpleTutorialStepView: View {
+struct HowToPlayStepView: View {
     var body: some View {
         VStack(spacing: 30) {
+            // How to play icon
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color(hex: "#ffbe00").opacity(0.3),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 160, height: 160)
+                
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: 60, weight: .medium))
+                    .foregroundColor(Color(hex: "#ffbe00"))
+            }
+            .frame(height: 160)
+            
             VStack(spacing: 16) {
                 Text("How to Play")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("Learn the simple rules of StarMatch")
-                    .font(.system(size: 18))
-                    .foregroundColor(.white.opacity(0.8))
+                Text("1️⃣ TAP stars on the screen to select them\n\n2️⃣ Selected stars will glow and show a selection ring\n\n3️⃣ When you select 3+ stars of the same constellation, they automatically match\n\n4️⃣ Matched stars turn green with checkmarks\n\n5️⃣ Continue finding more constellations!")
+                    .font(.system(size: 16))
+                    .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.center)
+                    .lineSpacing(4)
                     .padding(.horizontal, 20)
             }
-            
-            // Static demonstration area
-            VStack(spacing: 24) {
-                // Step 1
-                HStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "#ffbe00"))
-                            .frame(width: 40, height: 40)
-                        
-                        Text("1")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(Color(hex: "#02102b"))
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Find Matching Stars")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
-                        
-                        Text("Look for stars of the same constellation")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                
-                // Step 2
-                HStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "#bd0e1b"))
-                            .frame(width: 40, height: 40)
-                        
-                        Text("2")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.white)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Connect 3 or More")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
-                        
-                        Text("Tap 3+ stars to create a constellation")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                
-                // Step 3
-                HStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(.white)
-                            .frame(width: 40, height: 40)
-                        
-                        Text("3")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(Color(hex: "#02102b"))
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Score Points")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
-                        
-                        Text("Earn points and unlock space facts")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-            }
-            
-            // Visual example
-            VStack(spacing: 12) {
-                Text("Example Constellation")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.white.opacity(0.8))
-                
-                HStack(spacing: 12) {
-                    ForEach(0..<5, id: \.self) { index in
-                        Circle()
-                            .fill(Color(hex: "#ffbe00"))
-                            .frame(width: 16, height: 16)
-                    }
-                }
-                
-                Text("Ursa Major (Big Dipper)")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "#ffbe00"))
-            }
-            .padding(20)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.black.opacity(0.3))
-            )
-            .padding(.horizontal, 20)
         }
     }
 }
 
-struct FeaturesStepView: View {
+struct ScoringStepView: View {
     let isAnimating: Bool
     
     var body: some View {
         VStack(spacing: 30) {
+            // Scoring icon
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.white.opacity(0.3),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 160, height: 160)
+                
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 60, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .frame(height: 160)
+            
             VStack(spacing: 16) {
-                Text("Discover Features")
+                Text("Scoring System")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
-                
-                Text("Customize your star avatar, compete with friends, and discover educational tips")
-                    .font(.system(size: 18))
-                    .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
+                
+                Text("🏆 POINTS:\n• 3 stars = 100 points\n• 4 stars = 200 points\n• 5+ stars = 300+ points\n\n🔥 COMBO BONUS:\n• Match constellations quickly for combo multipliers\n\n📚 LEARNING:\n• Each constellation teaches you astronomy facts and wellness tips!")
+                    .font(.system(size: 16))
+                    .foregroundColor(.white.opacity(0.9))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
                     .padding(.horizontal, 20)
             }
-            
-            // Feature highlights
-            VStack(spacing: 20) {
-                FeatureRow(
-                    icon: "person.crop.circle.fill",
-                    title: "Star Avatars",
-                    description: "Unlock unique constellation avatars",
-                    color: Color(hex: "#bd0e1b"),
-                    isAnimating: isAnimating
-                )
-                
-                FeatureRow(
-                    icon: "trophy.fill",
-                    title: "Leaderboards",
-                    description: "Compete with friends globally",
-                    color: Color(hex: "#ffbe00"),
-                    isAnimating: isAnimating
-                )
-                
-                FeatureRow(
-                    icon: "lightbulb.fill",
-                    title: "Educational Tips",
-                    description: "Learn about space and wellness",
-                    color: Color.white,
-                    isAnimating: isAnimating
-                )
-            }
         }
-    }
-}
-
-struct FeatureRow: View {
-    let icon: String
-    let title: String
-    let description: String
-    let color: Color
-    let isAnimating: Bool
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 24))
-                .foregroundColor(color)
-                .frame(width: 40, height: 40)
-                .scaleEffect(isAnimating ? 1.1 : 1.0)
-                .animation(.easeInOut(duration: 0.5), value: isAnimating)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                
-                Text(description)
-                    .font(.system(size: 14))
-                    .foregroundColor(.white.opacity(0.7))
-            }
-            
-            Spacer()
-        }
-        .padding(.horizontal, 40)
     }
 }
 
@@ -471,14 +340,15 @@ struct CompletedStepView: View {
                     .font(.system(size: 80))
                     .foregroundColor(Color(hex: "#ffbe00"))
             }
+            .frame(height: 200)
             
             VStack(spacing: 16) {
-                Text("Ready to Explore!")
+                Text("Ready to Play!")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 
-                Text("You're all set! Start your stellar adventure and reach for the stars")
+                Text("You now know how to play StarMatch! Use the Constellation Guide to study star patterns, then test your knowledge in the game. Good luck, astronomer!")
                     .font(.system(size: 18))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
