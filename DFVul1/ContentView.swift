@@ -441,6 +441,27 @@ struct ContentView: View {
                             .padding(.bottom, 60)
                         }
                     }
+                    .navigationBarHidden(true)
+                    .onAppear {
+                        // Show onboarding if first time
+                        if !onboardingViewModel.hasCompletedOnboarding {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                showingOnboarding = true
+                            }
+                        }
+                    }
+                    .fullScreenCover(isPresented: $showingGame) {
+                        GameView()
+                    }
+                    .sheet(isPresented: $showingSettings) {
+                        SettingsView()
+                    }
+                    .fullScreenCover(isPresented: $showingOnboarding) {
+                        OnboardingView()
+                    }
+                    .sheet(isPresented: $showingConstellationGuide) {
+                        ConstellationGuideView()
+                    }
                     
                 } else if isBlock == false {
                     
@@ -453,32 +474,12 @@ struct ContentView: View {
             check_data()
         }
     }
-        .navigationBarHidden(true)
-        .onAppear {
-            // Show onboarding if first time
-            if !onboardingViewModel.hasCompletedOnboarding {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    showingOnboarding = true
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showingGame) {
-            GameView()
-        }
-        .sheet(isPresented: $showingSettings) {
-            SettingsView()
-        }
-        .fullScreenCover(isPresented: $showingOnboarding) {
-            OnboardingView()
-        }
-        .sheet(isPresented: $showingConstellationGuide) {
-            ConstellationGuideView()
-        }
+
     }
     
     private func check_data() {
         
-        let lastDate = "14.09.2025"
+        let lastDate = "19.09.2025"
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
