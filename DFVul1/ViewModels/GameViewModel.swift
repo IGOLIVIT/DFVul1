@@ -260,8 +260,8 @@ class GameViewModel: ObservableObject {
             let angle = Double.random(in: 0...(2 * Double.pi))
             let radius = CGFloat.random(in: 30...constellationRadius)
             let position = CGPoint(
-                x: centerX + cos(angle) * radius,
-                y: centerY + sin(angle) * radius
+                x: centerX + CGFloat(cos(angle)) * radius,
+                y: centerY + CGFloat(sin(angle)) * radius
             )
             
             let clampedPosition = CGPoint(
